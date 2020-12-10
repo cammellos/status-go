@@ -2197,6 +2197,93 @@ func (s *MessengerSuite) TestSentEventTracking() {
 	s.True(rawMessage.Sent)
 }
 
+func (s *MessengerSuite) TestLastSentField() {
+	//send message
+	chat := CreatePublicChat("test-chat", s.m.transport)
+	err := s.m.SaveChat(&chat)
+	s.NoError(err)
+	inputMessage := buildTestMessage(chat)
+
+	_, err = s.m.SendChatMessage(context.Background(), inputMessage)
+	s.NoError(err)
+
+	rawMessage, err := s.m.persistence.RawMessageByID(inputMessage.ID)
+	s.NoError(err)
+	s.Equal(1, rawMessage.SendCount)
+
+	//make sure LastSent is set
+	s.NotEqual(uint64(0), rawMessage.LastSent, "rawMessage.LastSent should be non-zero after sending")
+}
+
+func (s *MessengerSuite) TestShouldResendEmoji() {
+	// shouldn't try to resend non-emoji messages.
+	ok, err := shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_CONTACT_UPDATE,
+		Expired:     true,
+		SendCount:   2,
+	})
+	s.Error(err)
+	s.False(ok)
+
+	// shouldn't try to resend non-expired messages
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     false,
+		SendCount:   1,
+	})
+	s.Error(err)
+	s.False(ok)
+
+	// messages that already sent 3 times return false
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     true,
+		SendCount:   3,
+	})
+	s.NoError(err)
+	s.False(ok)
+
+	// message sent one time CAN'T be resend in 15 seconds (only after 30)
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     true,
+		SendCount:   1,
+		LastSent:    uint64(time.Now().Add(-15 * time.Second).Unix()),
+	})
+	s.NoError(err)
+	s.False(ok)
+
+	// message sent one time CAN be resend in 35 seconds
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     true,
+		SendCount:   1,
+		LastSent:    uint64(time.Now().Add(-35 * time.Second).Unix()),
+	})
+	s.NoError(err)
+	s.True(ok)
+
+	// message sent two times CAN'T be resend in 35 seconds (only after 60)
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     true,
+		SendCount:   2,
+		LastSent:    uint64(time.Now().Add(-35 * time.Second).Unix()),
+	})
+	s.NoError(err)
+	s.False(ok)
+
+	// message sent tow times CAN be resend in 65 seconds
+	ok, err = shouldResendEmojiReaction(&common.RawMessage{
+		MessageType: protobuf.ApplicationMetadataMessage_EMOJI_REACTION,
+		Expired:     true,
+		SendCount:   2,
+		LastSent:    uint64(time.Now().Add(-65 * time.Second).Unix()),
+	})
+	s.NoError(err)
+	s.True(ok)
+}
+
 func (s *MessengerSuite) TestMessageExpired() {
 	//send message
 	chat := CreatePublicChat("test-chat", s.m.transport)
@@ -2248,11 +2335,22 @@ func (s *MessengerSuite) TestResendExpiredEmojis() {
 	s.Equal(1, rawMessage.SendCount)
 	s.False(rawMessage.Expired)
 
-	//imitate reaction expired, make sure it WAS resent under the hood
+	//imitate reaction expired, make sure it WASN't resent immediately
 	err = s.m.processExpiredMessages([]string{emojiID})
 	s.NoError(err)
 
-	//make sure flag set correctly
+	//expired flag should be set
+	rawMessage, err = s.m.persistence.RawMessageByID(emojiID)
+	s.NoError(err)
+	s.True(rawMessage.Expired)
+	s.Equal(1, rawMessage.SendCount)
+
+	//imitate that more than 30 seconds passed since message was sent
+	rawMessage.LastSent = uint64(time.Unix(int64(rawMessage.LastSent), 0).Add(-35 * time.Second).Unix())
+	err = s.m.persistence.SaveRawMessage(rawMessage)
+	s.NoError(err)
+	time.Sleep(2 * time.Second)
+
 	rawMessage, err = s.m.persistence.RawMessageByID(emojiID)
 	s.NoError(err)
 	s.False(rawMessage.Expired)

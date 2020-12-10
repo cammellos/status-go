@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"os"
 	"reflect"
@@ -41,6 +42,8 @@ import (
 const PubKeyStringLength = 132
 
 const transactionSentTxt = "Transaction sent"
+
+const emojiResendMinDelay = 30
 
 // Messenger is a entity managing chats and messages.
 // It acts as a bridge between the application and encryption
@@ -348,14 +351,25 @@ func (m *Messenger) processExpiredMessages(ids []string) error {
 		}
 	}
 
-	if m.online() {
-		err := m.resendExpiredEmojiReactions()
-		if err != nil {
-			return errors.Wrapf(err, "Unable to resend expired emoji reactions")
-		}
+	return nil
+}
+
+func shouldResendEmojiReaction(message *common.RawMessage) (bool, error) {
+	if message.MessageType != protobuf.ApplicationMetadataMessage_EMOJI_REACTION {
+		return false, errors.New("Should resend only emoji reactions")
 	}
 
-	return nil
+	if !message.Expired {
+		return false, errors.New("Should resend only expired messages")
+	}
+
+	if message.SendCount >= 3 {
+		return false, nil
+	}
+	//exponential backoff depends on how many attempts to send message already made
+	backoff := time.Duration(math.Pow(2, float64(message.SendCount-1))) * emojiResendMinDelay * time.Second
+	backoffElapsed := time.Now().After(time.Unix(int64(message.LastSent), 0).Add(backoff))
+	return backoffElapsed, nil
 }
 
 func (m *Messenger) resendExpiredEmojiReactions() error {
@@ -369,7 +383,8 @@ func (m *Messenger) resendExpiredEmojiReactions() error {
 		if err != nil {
 			return errors.Wrapf(err, "Can't get raw message with id %v", id)
 		}
-		if rawMessage.SendCount < 3 {
+
+		if ok, err := shouldResendEmojiReaction(rawMessage); ok {
 			//remove expired flag and resend
 			rawMessage.Expired = false
 			err = m.persistence.SaveRawMessage(rawMessage)
@@ -381,6 +396,8 @@ func (m *Messenger) resendExpiredEmojiReactions() error {
 			if err != nil {
 				return errors.Wrapf(err, "Can't resend expired message with id %v", rawMessage.ID)
 			}
+		} else {
+			return err
 		}
 	}
 	return nil
@@ -421,6 +438,7 @@ func (m *Messenger) Start() error {
 	m.handleEncryptionLayerSubscriptions(subscriptions)
 	m.handleConnectionChange(m.online())
 	m.watchConnectionChange()
+	m.watchExpiredEmojis()
 	return nil
 }
 
@@ -430,11 +448,6 @@ func (m *Messenger) handleConnectionChange(online bool) {
 		if m.pushNotificationClient != nil {
 			m.pushNotificationClient.Online()
 		}
-		err := m.resendExpiredEmojiReactions()
-		if err != nil {
-			m.logger.Info("Unable to resend expired emoji reactions", zap.Error(err))
-		}
-
 	} else {
 		if m.pushNotificationClient != nil {
 			m.pushNotificationClient.Offline()
@@ -563,9 +576,27 @@ func (m *Messenger) watchConnectionChange() {
 			case <-m.quit:
 				return
 			}
-
 		}
+	}()
+}
 
+// watchExpiredEmojis regularly checks for expired emojis and invoke their resending
+func (m *Messenger) watchExpiredEmojis() {
+	m.logger.Debug("watching expired emojis")
+	go func() {
+		for {
+			select {
+			case <-time.After(time.Second):
+				if m.online() {
+					err := m.resendExpiredEmojiReactions()
+					if err != nil {
+						m.logger.Debug("Error when resending expired emoji reactions", zap.Error(err))
+					}
+				}
+			case <-m.quit:
+				return
+			}
+		}
 	}()
 }
 
@@ -1834,6 +1865,7 @@ func (m *Messenger) dispatchMessage(ctx context.Context, spec common.RawMessage)
 	}
 	spec.ID = types.EncodeHex(id)
 	spec.SendCount++
+	spec.LastSent = uint64(time.Now().Unix())
 	err = m.persistence.SaveRawMessage(&spec)
 	if err != nil {
 		return nil, err
@@ -3850,8 +3882,6 @@ func generateAliasAndIdenticon(pk string) (string, string, error) {
 func (m *Messenger) SendEmojiReaction(ctx context.Context, chatID, messageID string, emojiID protobuf.EmojiReaction_Type) (*MessengerResponse, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-
-	m.logger.Info("- SendEmojiReaction")
 
 	var response MessengerResponse
 
