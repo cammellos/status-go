@@ -31,8 +31,6 @@
 // 1603198582_add_profile_chat_field.up.sql (45B)
 // 1603816533_add_links.down.sql (0)
 // 1603816533_add_links.up.sql (48B)
-// 1606832283_raw_messages_expired.down.sql (0)
-// 1606832283_raw_messages_expired.up.sql (100B)
 // doc.go (850B)
 
 package migrations
@@ -722,46 +720,6 @@ func _1603816533_add_linksUpSql() (*asset, error) {
 	return a, nil
 }
 
-var __1606832283_raw_messages_expiredDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x01\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00")
-
-func _1606832283_raw_messages_expiredDownSqlBytes() ([]byte, error) {
-	return bindataRead(
-		__1606832283_raw_messages_expiredDownSql,
-		"1606832283_raw_messages_expired.down.sql",
-	)
-}
-
-func _1606832283_raw_messages_expiredDownSql() (*asset, error) {
-	bytes, err := _1606832283_raw_messages_expiredDownSqlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "1606832283_raw_messages_expired.down.sql", size: 0, mode: os.FileMode(0644), modTime: time.Unix(1606907591, 0)}
-	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55}}
-	return a, nil
-}
-
-var __1606832283_raw_messages_expiredUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\x28\x4a\x2c\x8f\xcf\x4d\x2d\x2e\x4e\x4c\x4f\x2d\x56\x70\x74\x71\x51\x70\xf6\xf7\x09\xf5\xf5\x53\x48\xad\x28\xc8\x2c\x4a\x4d\x51\x70\xf2\xf7\xf7\x51\x48\x49\x4d\x4b\x2c\xcd\x29\x51\x48\x4b\xcc\x29\x4e\xb5\xe6\x0a\x0d\x70\x71\x0c\x41\xd3\x1a\xec\x1a\x02\xd7\x63\xab\x60\x60\x0d\x08\x00\x00\xff\xff\x0a\xcf\x15\x6e\x64\x00\x00\x00")
-
-func _1606832283_raw_messages_expiredUpSqlBytes() ([]byte, error) {
-	return bindataRead(
-		__1606832283_raw_messages_expiredUpSql,
-		"1606832283_raw_messages_expired.up.sql",
-	)
-}
-
-func _1606832283_raw_messages_expiredUpSql() (*asset, error) {
-	bytes, err := _1606832283_raw_messages_expiredUpSqlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "1606832283_raw_messages_expired.up.sql", size: 100, mode: os.FileMode(0644), modTime: time.Unix(1606907591, 0)}
-	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x85, 0x9b, 0x28, 0x97, 0xdf, 0x73, 0xea, 0x9c, 0xd3, 0xa4, 0x8, 0x87, 0xe9, 0x90, 0x39, 0x11, 0x83, 0xdd, 0x1b, 0x8c, 0xf0, 0x5e, 0xd7, 0xf5, 0xa, 0xc7, 0x11, 0x3c, 0xd, 0x62, 0xcc, 0x9e}}
-	return a, nil
-}
-
 var _docGo = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x52\x3f\x8f\xdb\x3e\x0c\xdd\xf3\x29\x1e\x6e\xb9\xe5\x22\x07\xf8\xfd\xa6\xdb\x3a\x74\xe8\xd2\x2e\xd9\x0b\x46\xa6\x6d\x22\x32\xe5\x8a\xf4\x39\xf9\xf6\x85\x74\x17\x9c\x51\x14\xe8\x4a\x89\x8f\xef\x5f\xd7\xe1\x3c\x89\x61\x90\xc4\x10\x83\x72\x64\x33\x2a\x77\x5c\x38\xd2\x6a\x8c\xa7\x51\x7c\x5a\x2f\x21\xe6\xb9\x33\x27\x5f\xed\x28\x73\x37\xcb\x58\xc8\xb9\x7b\xfb\xff\xe9\xd0\x75\x88\xa4\xcf\x8e\x89\xb4\x4f\xdc\xb0\x0c\xe6\x54\x5c\x74\xc4\x26\x3e\x81\xb0\x14\x1e\xe4\x16\xf0\xc5\x91\x98\xcc\xe1\x13\xf9\xb3\xc1\x27\x46\x24\xe3\x0a\x33\xe4\x82\x31\x1f\x2f\xa2\x3d\x39\x85\x3a\xfa\x36\xec\x26\x95\x61\xa4\x94\xb8\xc7\x50\xf2\xdc\x76\x8d\x66\x46\x2f\x85\xa3\xe7\x72\x7f\x01\x99\xb1\x43\x69\x66\xab\xfb\x13\xbd\x31\x34\x7f\x9c\x07\x69\xff\x6f\x45\xd8\x72\xb9\x1a\xc8\xc0\xb7\x85\xa3\x73\x1f\x0e\x15\xeb\xfb\x8f\xf3\xd7\x57\x9c\x27\xae\xf0\x55\x5a\x1e\x1a\x85\x66\x9e\x32\xf7\x06\xcf\x18\x72\x4a\x79\x6b\x0f\xab\xca\x0d\x2e\x33\x9b\xd3\xbc\x20\x66\x7d\x63\x75\xc9\x5a\xd1\x56\x4d\x72\xe5\xf6\xcf\xb7\x0c\x51\x71\xa1\xf4\xee\x5e\x93\x7e\x7e\x37\xe8\x11\x44\x5c\x4b\x61\xf5\x74\x6f\x2b\xac\xb1\xdc\x97\x8a\x85\x77\xe6\x92\xd5\x9a\xbc\xa5\x64\xcf\x31\xa7\xdd\xbc\xa2\xd9\x44\x85\x3f\x1d\x73\xba\x24\x7e\xc1\x36\x49\x9c\x30\x33\xa9\xb5\x40\xda\x87\x44\xce\xe6\x9f\xfb\x10\x85\x73\x99\xad\x0a\xae\xfc\xaa\xbb\x15\xb3\x16\xe7\x91\xc3\x8e\x50\x33\x7f\xa1\xf8\x51\x85\xc7\x95\xd5\xd8\x40\x7f\x98\xf2\x08\x79\x63\x50\xdf\xe3\x74\x3a\x9d\xfe\xfb\x19\x42\x68\x5d\xe0\x1b\xcd\x4b\xa5\xe9\xb5\xa3\x9b\xa4\x84\x0b\x43\x46\xcd\x85\xfb\xca\x8a\x6f\x62\xad\x64\x31\x09\xab\xd7\xcc\x2a\x5e\x4e\x3d\x97\xaa\x47\xf7\x7a\xfe\x66\x59\x38\x1c\x16\x8a\x57\x1a\x19\xf6\x2b\x89\x73\x0d\x7a\xcc\xaf\x23\x2b\xd7\x3a\xec\xcb\x77\x5c\xae\xe3\xde\xec\x63\x46\x08\xdd\xe7\x20\x8c\x19\xe1\xf0\x3b\x00\x00\xff\xff\x12\xcd\x7f\xc4\x52\x03\x00\x00")
 
 func docGoBytes() ([]byte, error) {
@@ -904,8 +862,6 @@ var _bindata = map[string]func() (*asset, error){
 	"1603198582_add_profile_chat_field.up.sql":                 _1603198582_add_profile_chat_fieldUpSql,
 	"1603816533_add_links.down.sql":                            _1603816533_add_linksDownSql,
 	"1603816533_add_links.up.sql":                              _1603816533_add_linksUpSql,
-	"1606832283_raw_messages_expired.down.sql":                 _1606832283_raw_messages_expiredDownSql,
-	"1606832283_raw_messages_expired.up.sql":                   _1606832283_raw_messages_expiredUpSql,
 	"doc.go":                                                   docGo,
 }
 
@@ -953,40 +909,38 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"000001_init.down.db.sql":                                  &bintree{_000001_initDownDbSql, map[string]*bintree{}},
-	"000001_init.up.db.sql":                                    &bintree{_000001_initUpDbSql, map[string]*bintree{}},
-	"000002_add_last_ens_clock_value.down.sql":                 &bintree{_000002_add_last_ens_clock_valueDownSql, map[string]*bintree{}},
-	"000002_add_last_ens_clock_value.up.sql":                   &bintree{_000002_add_last_ens_clock_valueUpSql, map[string]*bintree{}},
-	"1586358095_add_replace.down.sql":                          &bintree{_1586358095_add_replaceDownSql, map[string]*bintree{}},
-	"1586358095_add_replace.up.sql":                            &bintree{_1586358095_add_replaceUpSql, map[string]*bintree{}},
-	"1588665364_add_image_data.down.sql":                       &bintree{_1588665364_add_image_dataDownSql, map[string]*bintree{}},
-	"1588665364_add_image_data.up.sql":                         &bintree{_1588665364_add_image_dataUpSql, map[string]*bintree{}},
-	"1589365189_add_pow_target.down.sql":                       &bintree{_1589365189_add_pow_targetDownSql, map[string]*bintree{}},
-	"1589365189_add_pow_target.up.sql":                         &bintree{_1589365189_add_pow_targetUpSql, map[string]*bintree{}},
-	"1591277220_add_index_messages.down.sql":                   &bintree{_1591277220_add_index_messagesDownSql, map[string]*bintree{}},
-	"1591277220_add_index_messages.up.sql":                     &bintree{_1591277220_add_index_messagesUpSql, map[string]*bintree{}},
-	"1593087212_add_mute_chat_and_raw_message_fields.down.sql": &bintree{_1593087212_add_mute_chat_and_raw_message_fieldsDownSql, map[string]*bintree{}},
-	"1593087212_add_mute_chat_and_raw_message_fields.up.sql":   &bintree{_1593087212_add_mute_chat_and_raw_message_fieldsUpSql, map[string]*bintree{}},
-	"1595862781_add_audio_data.down.sql":                       &bintree{_1595862781_add_audio_dataDownSql, map[string]*bintree{}},
-	"1595862781_add_audio_data.up.sql":                         &bintree{_1595862781_add_audio_dataUpSql, map[string]*bintree{}},
-	"1595865249_create_emoji_reactions_table.down.sql":         &bintree{_1595865249_create_emoji_reactions_tableDownSql, map[string]*bintree{}},
-	"1595865249_create_emoji_reactions_table.up.sql":           &bintree{_1595865249_create_emoji_reactions_tableUpSql, map[string]*bintree{}},
-	"1596805115_create_group_chat_invitations_table.down.sql":  &bintree{_1596805115_create_group_chat_invitations_tableDownSql, map[string]*bintree{}},
-	"1596805115_create_group_chat_invitations_table.up.sql":    &bintree{_1596805115_create_group_chat_invitations_tableUpSql, map[string]*bintree{}},
-	"1597322655_add_invitation_admin_chat_field.up.sql":        &bintree{_1597322655_add_invitation_admin_chat_fieldUpSql, map[string]*bintree{}},
-	"1597757544_add_nickname.up.sql":                           &bintree{_1597757544_add_nicknameUpSql, map[string]*bintree{}},
-	"1598955122_add_mentions.down.sql":                         &bintree{_1598955122_add_mentionsDownSql, map[string]*bintree{}},
-	"1598955122_add_mentions.up.sql":                           &bintree{_1598955122_add_mentionsUpSql, map[string]*bintree{}},
-	"1599641390_add_emoji_reactions_index.down.sql":            &bintree{_1599641390_add_emoji_reactions_indexDownSql, map[string]*bintree{}},
-	"1599641390_add_emoji_reactions_index.up.sql":              &bintree{_1599641390_add_emoji_reactions_indexUpSql, map[string]*bintree{}},
-	"1599720851_add_seen_index_remove_long_messages.down.sql":  &bintree{_1599720851_add_seen_index_remove_long_messagesDownSql, map[string]*bintree{}},
-	"1599720851_add_seen_index_remove_long_messages.up.sql":    &bintree{_1599720851_add_seen_index_remove_long_messagesUpSql, map[string]*bintree{}},
-	"1603198582_add_profile_chat_field.up.sql":                 &bintree{_1603198582_add_profile_chat_fieldUpSql, map[string]*bintree{}},
-	"1603816533_add_links.down.sql":                            &bintree{_1603816533_add_linksDownSql, map[string]*bintree{}},
-	"1603816533_add_links.up.sql":                              &bintree{_1603816533_add_linksUpSql, map[string]*bintree{}},
-	"1606832283_raw_messages_expired.down.sql":                 &bintree{_1606832283_raw_messages_expiredDownSql, map[string]*bintree{}},
-	"1606832283_raw_messages_expired.up.sql":                   &bintree{_1606832283_raw_messages_expiredUpSql, map[string]*bintree{}},
-	"doc.go":                                                   &bintree{docGo, map[string]*bintree{}},
+	"000001_init.down.db.sql": {_000001_initDownDbSql, map[string]*bintree{}},
+	"000001_init.up.db.sql": {_000001_initUpDbSql, map[string]*bintree{}},
+	"000002_add_last_ens_clock_value.down.sql": {_000002_add_last_ens_clock_valueDownSql, map[string]*bintree{}},
+	"000002_add_last_ens_clock_value.up.sql": {_000002_add_last_ens_clock_valueUpSql, map[string]*bintree{}},
+	"1586358095_add_replace.down.sql": {_1586358095_add_replaceDownSql, map[string]*bintree{}},
+	"1586358095_add_replace.up.sql": {_1586358095_add_replaceUpSql, map[string]*bintree{}},
+	"1588665364_add_image_data.down.sql": {_1588665364_add_image_dataDownSql, map[string]*bintree{}},
+	"1588665364_add_image_data.up.sql": {_1588665364_add_image_dataUpSql, map[string]*bintree{}},
+	"1589365189_add_pow_target.down.sql": {_1589365189_add_pow_targetDownSql, map[string]*bintree{}},
+	"1589365189_add_pow_target.up.sql": {_1589365189_add_pow_targetUpSql, map[string]*bintree{}},
+	"1591277220_add_index_messages.down.sql": {_1591277220_add_index_messagesDownSql, map[string]*bintree{}},
+	"1591277220_add_index_messages.up.sql": {_1591277220_add_index_messagesUpSql, map[string]*bintree{}},
+	"1593087212_add_mute_chat_and_raw_message_fields.down.sql": {_1593087212_add_mute_chat_and_raw_message_fieldsDownSql, map[string]*bintree{}},
+	"1593087212_add_mute_chat_and_raw_message_fields.up.sql": {_1593087212_add_mute_chat_and_raw_message_fieldsUpSql, map[string]*bintree{}},
+	"1595862781_add_audio_data.down.sql": {_1595862781_add_audio_dataDownSql, map[string]*bintree{}},
+	"1595862781_add_audio_data.up.sql": {_1595862781_add_audio_dataUpSql, map[string]*bintree{}},
+	"1595865249_create_emoji_reactions_table.down.sql": {_1595865249_create_emoji_reactions_tableDownSql, map[string]*bintree{}},
+	"1595865249_create_emoji_reactions_table.up.sql": {_1595865249_create_emoji_reactions_tableUpSql, map[string]*bintree{}},
+	"1596805115_create_group_chat_invitations_table.down.sql": {_1596805115_create_group_chat_invitations_tableDownSql, map[string]*bintree{}},
+	"1596805115_create_group_chat_invitations_table.up.sql": {_1596805115_create_group_chat_invitations_tableUpSql, map[string]*bintree{}},
+	"1597322655_add_invitation_admin_chat_field.up.sql": {_1597322655_add_invitation_admin_chat_fieldUpSql, map[string]*bintree{}},
+	"1597757544_add_nickname.up.sql": {_1597757544_add_nicknameUpSql, map[string]*bintree{}},
+	"1598955122_add_mentions.down.sql": {_1598955122_add_mentionsDownSql, map[string]*bintree{}},
+	"1598955122_add_mentions.up.sql": {_1598955122_add_mentionsUpSql, map[string]*bintree{}},
+	"1599641390_add_emoji_reactions_index.down.sql": {_1599641390_add_emoji_reactions_indexDownSql, map[string]*bintree{}},
+	"1599641390_add_emoji_reactions_index.up.sql": {_1599641390_add_emoji_reactions_indexUpSql, map[string]*bintree{}},
+	"1599720851_add_seen_index_remove_long_messages.down.sql": {_1599720851_add_seen_index_remove_long_messagesDownSql, map[string]*bintree{}},
+	"1599720851_add_seen_index_remove_long_messages.up.sql": {_1599720851_add_seen_index_remove_long_messagesUpSql, map[string]*bintree{}},
+	"1603198582_add_profile_chat_field.up.sql": {_1603198582_add_profile_chat_fieldUpSql, map[string]*bintree{}},
+	"1603816533_add_links.down.sql": {_1603816533_add_linksDownSql, map[string]*bintree{}},
+	"1603816533_add_links.up.sql": {_1603816533_add_linksUpSql, map[string]*bintree{}},
+	"doc.go": {docGo, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory.

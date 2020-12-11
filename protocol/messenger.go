@@ -44,6 +44,7 @@ const PubKeyStringLength = 132
 const transactionSentTxt = "Transaction sent"
 
 const emojiResendMinDelay = 30
+const emojiResendMaxCount = 3
 
 // Messenger is a entity managing chats and messages.
 // It acts as a bridge between the application and encryption
@@ -114,17 +115,7 @@ func (interceptor EnvelopeEventsInterceptor) EnvelopeSent(identifiers [][]byte) 
 
 // EnvelopeExpired triggered when envelope is expired but wasn't delivered to any peer.
 func (interceptor EnvelopeEventsInterceptor) EnvelopeExpired(identifiers [][]byte, err error) {
-	if interceptor.Messenger != nil {
-		var ids []string
-		for _, identifierBytes := range identifiers {
-			ids = append(ids, types.EncodeHex(identifierBytes))
-		}
-
-		err := interceptor.Messenger.processExpiredMessages(ids)
-		if err != nil {
-			interceptor.Messenger.logger.Info("Messenger failed to process expired messages", zap.Error(err))
-		}
-	}
+	//we don't track expired events in Messenger, so just redirect to handler
 	interceptor.EnvelopeEventsHandler.EnvelopeExpired(identifiers, err)
 }
 
@@ -333,37 +324,16 @@ func (m *Messenger) processSentMessages(ids []string) error {
 	return nil
 }
 
-func (m *Messenger) processExpiredMessages(ids []string) error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	for _, id := range ids {
-		rawMessage, err := m.persistence.RawMessageByID(id)
-		if err != nil {
-			return errors.Wrapf(err, "Can't get raw message with id %v", id)
-		}
-
-		rawMessage.Expired = true
-
-		err = m.persistence.SaveRawMessage(rawMessage)
-		if err != nil {
-			return errors.Wrapf(err, "Can't save raw message marked as expired")
-		}
-	}
-
-	return nil
-}
-
 func shouldResendEmojiReaction(message *common.RawMessage) (bool, error) {
 	if message.MessageType != protobuf.ApplicationMetadataMessage_EMOJI_REACTION {
 		return false, errors.New("Should resend only emoji reactions")
 	}
 
-	if !message.Expired {
-		return false, errors.New("Should resend only expired messages")
+	if message.Sent {
+		return false, errors.New("Should resend only non-sent messages")
 	}
 
-	if message.SendCount >= 3 {
+	if message.SendCount > emojiResendMaxCount {
 		return false, nil
 	}
 	//exponential backoff depends on how many attempts to send message already made
@@ -373,7 +343,7 @@ func shouldResendEmojiReaction(message *common.RawMessage) (bool, error) {
 }
 
 func (m *Messenger) resendExpiredEmojiReactions() error {
-	ids, err := m.persistence.ExpiredEmojiReactionsIDs()
+	ids, err := m.persistence.ExpiredEmojiReactionsIDs(emojiResendMaxCount)
 	if err != nil {
 		return errors.Wrapf(err, "Can't get expired reactions from db")
 	}
@@ -385,8 +355,6 @@ func (m *Messenger) resendExpiredEmojiReactions() error {
 		}
 
 		if ok, err := shouldResendEmojiReaction(rawMessage); ok {
-			//remove expired flag and resend
-			rawMessage.Expired = false
 			err = m.persistence.SaveRawMessage(rawMessage)
 			if err != nil {
 				return errors.Wrapf(err, "Can't save raw message marked as non-expired")

@@ -411,39 +411,40 @@ func TestExpiredEmojiReactionsIDs(t *testing.T) {
 	require.NoError(t, err)
 	p := sqlitePersistence{db: db}
 
-	ids, err := p.ExpiredEmojiReactionsIDs()
+	ids, err := p.ExpiredEmojiReactionsIDs(emojiResendMaxCount)
 	require.NoError(t, err)
 	require.Empty(t, ids)
 
 	//save expired chat message
 	rawChatMessage := minimalRawMessage("chat-message-id", protobuf.ApplicationMetadataMessage_CHAT_MESSAGE)
-	rawChatMessage.Expired = true
+	rawChatMessage.Sent = false
 	err = p.SaveRawMessage(rawChatMessage)
 	require.NoError(t, err)
 
 	//make sure it doesn't apper in an expired emoji reactions list
-	ids, err = p.ExpiredEmojiReactionsIDs()
+	ids, err = p.ExpiredEmojiReactionsIDs(emojiResendMaxCount)
 	require.NoError(t, err)
 	require.Empty(t, ids)
 
 	//save expired emoji message
 	rawEmojiReaction := minimalRawMessage("emoji-message-id", protobuf.ApplicationMetadataMessage_EMOJI_REACTION)
-	rawEmojiReaction.Expired = true
+	rawEmojiReaction.Sent = false
 	err = p.SaveRawMessage(rawEmojiReaction)
 	require.NoError(t, err)
 
 	//make sure it appered in expired emoji reactions list
-	ids, err = p.ExpiredEmojiReactionsIDs()
+	ids, err = p.ExpiredEmojiReactionsIDs(emojiResendMaxCount)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(ids))
 
-	//save non-expired chat message
+	//save non-expired emoji reaction
 	rawEmojiReaction2 := minimalRawMessage("emoji-message-id2", protobuf.ApplicationMetadataMessage_EMOJI_REACTION)
+	rawEmojiReaction2.Sent = true
 	err = p.SaveRawMessage(rawEmojiReaction2)
 	require.NoError(t, err)
 
 	//make sure it didn't appear in expired emoji reactions list
-	ids, err = p.ExpiredEmojiReactionsIDs()
+	ids, err = p.ExpiredEmojiReactionsIDs(emojiResendMaxCount)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(ids))
 }

@@ -480,10 +480,9 @@ func (db sqlitePersistence) SaveRawMessage(message *common.RawMessage) error {
 		   recipients,
 		   skip_encryption,
 			 send_push_notification,
-			 expired,
 		   payload
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		message.ID,
 		message.LocalChatID,
 		message.LastSent,
@@ -494,7 +493,6 @@ func (db sqlitePersistence) SaveRawMessage(message *common.RawMessage) error {
 		encodedRecipients.Bytes(),
 		message.SkipEncryption,
 		message.SendPushNotification,
-		message.Expired,
 		message.Payload)
 	return err
 }
@@ -516,7 +514,6 @@ func (db sqlitePersistence) RawMessageByID(id string) (*common.RawMessage, error
 			  recipients,
 			  skip_encryption,
 				send_push_notification,
-				expired,
 			  payload
 			FROM
 				raw_messages
@@ -534,7 +531,6 @@ func (db sqlitePersistence) RawMessageByID(id string) (*common.RawMessage, error
 		&encodedRecipients,
 		&message.SkipEncryption,
 		&message.SendPushNotification,
-		&message.Expired,
 		&message.Payload,
 	)
 	if err != nil {
@@ -585,7 +581,7 @@ func (db sqlitePersistence) RawMessagesIDsByType(t protobuf.ApplicationMetadataM
 	return ids, nil
 }
 
-func (db sqlitePersistence) ExpiredEmojiReactionsIDs() ([]string, error) {
+func (db sqlitePersistence) ExpiredEmojiReactionsIDs(maxSendCount int) ([]string, error) {
 	ids := []string{}
 
 	rows, err := db.db.Query(`
@@ -594,8 +590,8 @@ func (db sqlitePersistence) ExpiredEmojiReactionsIDs() ([]string, error) {
 			FROM
 				raw_messages
 			WHERE
-			message_type = ? AND expired = ?`,
-		protobuf.ApplicationMetadataMessage_EMOJI_REACTION, true)
+			message_type = ? AND sent = ? AND send_count <= ?`,
+		protobuf.ApplicationMetadataMessage_EMOJI_REACTION, false, maxSendCount)
 	if err != nil {
 		return ids, err
 	}
